@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <script type="text/javascript">
+
+      // Modified version of algoritm found on this page:
+      // http://stackoverflow.com/questions/14343844/create-a-string-of-variable-length-filled-with-a-repeated-character
+      function repeatString(count, str) {
+        if (count === 0 || str.length === 0) return "";
+
+        var count2 = count / 2;
+        var result = str;
+
+        // Doubles the string every iteration
+        while((result.length / str.length) <= count2) {
+          result += result;
+        }
+
+        // Adds on the rest and returns it
+        return result + result.substring(0, (count - (result.length / str.length)) * str.length);
+      }
+
+      // Gimme a valid css color value for a pixel
+      function colorAtIndex(index, data) {
+        return "rgba(" + data[index] + "," + data[index + 1] + "," + data[index + 2] + "," + (data[index + 3] / 255.0) + ");";
+      }
+
+      // Make a whole bunch of divs and css rules to render the image
+      function image2divs(data, width, height) {
+        var container = document.getElementById("image-container");
+        var styleContainer = document.getElementById("image-style");
+
+        // One div for each pixel in the image (1/4th the length of data because data is an array of r,g,b,a components)
+        container.innerHTML = repeatString(data.length / 4, "<div></div>");
+        // Set width and height of "image" container
+        container.style.width = width + "px";
+        container.style.height = height + "px";
+
+        var styleStr = "";
+        var i = 0;
+        // Style each div for each pixel
+        for(i; i < data.length; i += 4) {
+          // I know of a couple of ways that generate a smaller string but too lazy to implement
+          styleStr += ".image-container > div:nth-child(" + ((i / 4) + 1) + ") { background-color: " + colorAtIndex(i, data) + " }\n";
+        }
+        // Make your browser cry
+        styleContainer.innerHTML = styleStr;
+      }
+
+      function onChange(e) {
+        // Only really want to deal with one file
+        var file = e.target.files[0];
+        if (!file) return;
+
+        var reader = new FileReader();
+        reader.onload = function(event) {
+          var img = new Image();
+          img.onload = function() {
+            // Need a canvas so we can play with the image data
+            var canvas = document.getElementById("temp-canvas");
+            canvas.width = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+
+            // Paste the image onto the canvas
+            var context = canvas.getContext("2d");
+            context.drawImage(img, 0, 0);
+
+            // Extract the image data and turn it into divs
+            image2divs(context.getImageData(0, 0, canvas.width, canvas.height).data, canvas.width, canvas.height);
+          };
+          img.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+      }
+
+      function bindEventListeners() {
+        document.getElementById("upload").addEventListener("change", onChange);
+      }
+    </script>
+    <style>
+      .image-container {
+        border: 1px solid black;
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        line-height: 1px;
+      }
+      .image-container > div {
+        width: 1px;
+        height: 1px;
+      }
+    </style>
+  </head>
+  <body onload="bindEventListeners();">
+    <p>Upload an image and it'll get turned into divs after pegging your CPU for about an hour</p>
+    <input accept="image/*" type="file" id="upload"/>
+    <style id="image-style"></style>
+    <canvas id="temp-canvas" style="display: none"></canvas>
+    <div class="image-container" id="image-container">
+    </div>
+  </body>
+</html>
