@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <script type="text/javascript">
+      var deck = []
+      var dealerHand = [[]]
+      var playerHand = [[]]
+
+      function shuffle() {
+        var cards = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+        var cardNums = {};
+        cards.map(function(c) {
+          cardNums[c] = 4;
+        });
+
+        deck = [];
+        while (deck.length < 52) {
+          card = cards[Math.round(Math.random() * cards.length)];
+          if (cardNums[card] > 0) {
+            deck.push(card);
+            cardNums[card]--;
+          }
+        }
+      }
+
+      function dealerDeal() {
+
+      }
+
+      function deal() {
+
+      }
+    </script>
+    <style>
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      .playing-area {
+        position: relative;
+        width: 600px;
+        height: 400px;
+        border: 1px solid black;
+      }
+      .playing-area .deck {
+        position: absolute;
+        left: 0px;
+        top: calc(50% - 20px);
+        font-size: 40px;
+      }
+      .player-options {
+        margin-top: 20px;
+        display: flex;
+      }
+      .player-options input:not(last-child) {
+        margin-right: 5px;
+      }
+    </style>
+  </head>
+  <body onload="shuffle()">
+    <div class="playing-area">
+      <div class="deck">
+        🂠
+      </div>
+      <div id="spent-cards" className="spent-cards">
+      </div>
+      <div id="dealer-hand" class="hand-container dealer-hand">
+      </div>
+      <div id="player-hand" class="hand-container player-hand">
+      </div>
+    </div>
+    <div class="player-options">
+      <input id="deal-button" onClick="deal()" type="button" value="Deal" />
+      <input id="surrender-button" onClick="surrender()" type="button" value="Surrender" />
+      <input id="hit-button" onClick="hit()" type="button" value="Hit" />
+      <input id="double-button" onClick="double()" type="button" value="Double" />
+      <input id="split-button" onClick="split()" type="button" value="Split" />
+      <input id="stand-button" onClick="stand()" type="button" value="Stand" />
+    </div>
+  </body>
+</html>
